@@ -1,5 +1,6 @@
 import 'package:bloc/bloc.dart';
 import 'package:the_counter_app/data/dataproviders/dio_data_provider.dart';
+import 'package:the_counter_app/data/dataproviders/named_place.dart';
 
 import '../../data/dataproviders/goelocator.dart';
 import 'app_cubit_states.dart';
@@ -8,12 +9,11 @@ class CounterCubit extends Cubit<AppCubitStates> {
   CounterCubit()
       : super(
           const AppCubitStates(
-            counterValue: 0,
-            wasIncremented: false,
-            wasReset: false,
-            location: 'LOCATION',
-            temperature: 'WEATHER',
-          ),
+              counterValue: 0,
+              wasIncremented: false,
+              wasReset: false,
+              location: 'Location',
+              temperature: 'Weather'),
         ) {
     // TODO: call methods()
   }
@@ -40,11 +40,16 @@ class CounterCubit extends Cubit<AppCubitStates> {
   Future getWeather() async =>
       emit(state.copyWith(temperature: await WeatherApiClient().getHttp()));
 
+  Future getLocalPlacemark() async =>
+      emit(state.copyWith(location: await NamedPlace().getLocationsName()));
+
   Future checkWeatherCondition(dynamic temperature) async {
-    if (temperature <= 9) {
-      emit(state.copyWith(isCold: true));
-    } else {
+    if (temperature > 20) {
       emit(state.copyWith(isCold: false));
+      print('callFromCubit: isCold -> false');
+    } else {
+      emit(state.copyWith(isCold: true));
+      print('callFromCubit: isCold -> true');
     }
   }
 }

@@ -10,14 +10,19 @@ import '../../../application/cubit/app_cubit.dart';
 class HomePage extends StatelessWidget {
   const HomePage({super.key});
 
-  Future getTemperature() async {
-    return CounterCubit().state.temperature;
+  Widget renderWeatherImage(bool weatherConditionCold) {
+    if (weatherConditionCold) {
+      return Image.asset('assets/images/1635155.png');
+    }
+    return Image.asset('assets/images/2487418.png');
   }
 
   @override
   Widget build(BuildContext context) {
     // this is how we can access cubit /////////////
-    final cubit = context.read<CounterCubit>();
+    final cubitReturn = context.read<CounterCubit>();
+    final cubitListen = context.watch<CounterCubit>();
+    final weatherCondition = cubitListen.state.isCold;
 
     return Scaffold(
       // TODO: <start!> this is gonna set the area whole way up and down ..
@@ -86,9 +91,14 @@ class HomePage extends StatelessWidget {
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: <Widget>[
-                    const Text(
-                      '📍 Your location',
-                      style: TextStyle(color: Colors.white),
+                    BlocBuilder<CounterCubit, AppCubitStates>(
+                      builder: (context, state) {
+                        cubitReturn.getLocalPlacemark();
+                        return Text(
+                          '📍  ${state.location}',
+                          style: const TextStyle(color: Colors.white),
+                        );
+                      },
                     ),
                     const SizedBox(height: 10.0),
                     const Text(
@@ -100,19 +110,26 @@ class HomePage extends StatelessWidget {
                       ),
                     ),
                     const SizedBox(height: 15.0),
-                    Image.asset('assets/images/2487418.png'),
+                    BlocBuilder<CounterCubit, AppCubitStates>(
+                      builder: (context, state) {
+                        print(
+                            'callFromHomeScreen : isCold -> ${cubitReturn.state.isCold}');
+                        return renderWeatherImage(cubitReturn.state.isCold);
+                      },
+                    ),
                     const SizedBox(height: 10.0),
                     Center(
                       child: BlocBuilder<CounterCubit, AppCubitStates>(
                         builder: (context, state) {
                           // TODO : <start!> Here we are loading / fetching the data : Location API + Weather API => temperature
-                          cubit.getWeather();
+                          cubitReturn.getWeather();
+
                           // TODO : <end!>
                           //
 
-                          print(cubit.state.temperature);
+                          print(cubitReturn.state.temperature);
                           return Text(
-                            '${cubit.state.temperature} °C',
+                            '${cubitReturn.state.temperature} °C',
                             style: const TextStyle(
                               fontWeight: FontWeight.w600,
                               fontSize: 55.0,

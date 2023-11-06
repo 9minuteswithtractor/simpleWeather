@@ -18,9 +18,5 @@ class AppCubitStates with _$AppCubitStates {
   }) = _AppCubitStates;
 
   factory AppCubitStates.initial() => const AppCubitStates(
-      counterValue: 0,
-      wasIncremented: false,
-      wasReset: false,
-      location: '',
-      temperature: '');
+      wasIncremented: false, wasReset: false, counterValue: 0);
 }
